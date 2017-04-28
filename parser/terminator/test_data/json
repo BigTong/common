@@ -1,0 +1,42 @@
+{
+  "meta": [
+    "car_brand//英菲尼迪",
+    "car_name//英菲尼迪EX",
+    "car_level//中型SUV"
+  ],
+  "parse_title": "掀背版G35 评测英菲尼迪EX35跨界车",
+  "parse_content": "<DIV></DIV>",
+  "thumbnail": "http://www0.autoimg.cn/video/carimg/2008/12/3/x_c93e_2f304cb7.jpg",
+  "url": "http://v.m.autohome.com.cn/v_2_1369.html",
+  "inlink": "http://v.m.autohome.com.cn/605/#pvareaid=104812",
+  "date": "2015-10-21 14:39:57",
+  "protect": "video",
+  "map_category": [
+    "汽车"
+  ],
+  "buyers":[
+    {
+      "name":"zhangsan",
+      "addr":"china",
+      "age":28
+    },
+    {
+      "name":"lisi",
+      "addr":"American",
+      "age":59
+    },
+    {
+      "name":"wangwu",
+      "addr":"Japan",
+      "age":47
+    }
+  ],
+  "c_vplay": 89780,
+  "c_vcmt": 5,
+  "c_vtime": 159,
+  "mtype": 1,
+  "dtype": 20,
+  "fts": 1445409733,
+  "not_remove": true,
+  "b_video": true
+}
