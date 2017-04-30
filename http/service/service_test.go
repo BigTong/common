@@ -1,4 +1,4 @@
-package http_service
+package service
 
 import (
 	"net/http"
@@ -10,21 +10,21 @@ var handler http.HandlerFunc = func(w http.ResponseWriter, req *http.Request) {
 }
 
 func TestHttps(t *testing.T) {
-	service := NewService("127.0.0.1", "8080")
-	service.WithHandleFunc("/hehe", handler)
-	service.SupportHttps(HTTPS_ONLY, "cert.pem", "key.pem")
-	service.Run()
+	service := NewHttpsService("127.0.0.1", "8080")
+	service.SetHandleFunc("/hehe", handler)
+	service.SetHttpsCertificate("cert.pem", "key.pem")
+	go service.Run()
 }
 
 func TestHttp(t *testing.T) {
-	service := NewService("127.0.0.1", "8080")
-	service.WithHandleFunc("/hehe", handler)
-	service.Run()
+	service := NewHttpService("127.0.0.1", "8080")
+	service.SetHandleFunc("/hehe", handler)
+	go service.Run()
 }
 
 func TestHttpAndHttps(t *testing.T) {
-	service := NewService("127.0.0.1", "8080")
-	service.WithHandleFunc("/hehe", handler)
-	service.SupportHttps(HTTP_AND_HTTPS, "cert.pem", "key.pem")
-	service.Run()
+	service := NewHttpAndHttpsService("127.0.0.1", "8080", "8081")
+	service.SetHandleFunc("/hehe", handler)
+	service.SetHttpsCertificate("cert.pem", "key.pem")
+	go service.Run()
 }

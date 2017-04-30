@@ -1,4 +1,4 @@
-package http_entity
+package client
 
 import (
 	"bytes"
@@ -9,10 +9,11 @@ import (
 	"net/http"
 	"strings"
 
-	"common/http_entity/utils"
+	"github.com/BigTong/common/dns"
+	"github.com/BigTong/common/http/util"
 )
 
-type HttpEntity struct {
+type HttpClient struct {
 	// request timeout threshold
 	timeout int
 
@@ -29,43 +30,43 @@ type HttpEntity struct {
 	keepAlive bool
 
 	// dns client interface, resolve host and ip address
-	dnsClient DnsClientInterface
+	dnsClient dns.DnsClientInterface
 
 	// http.Client
 	httpClient *http.Client
 }
 
-func (h *HttpEntity) TimeOut() int {
+func (h *HttpClient) TimeOut() int {
 	return h.timeout
 }
 
-func (h *HttpEntity) Ip() string {
+func (h *HttpClient) Ip() string {
 	return h.ip
 }
 
-func (h *HttpEntity) Proxy() string {
+func (h *HttpClient) Proxy() string {
 	return h.proxy
 }
 
-func (h *HttpEntity) NeedCookie() bool {
+func (h *HttpClient) NeedCookie() bool {
 	return h.needCookie
 }
 
-func (h *HttpEntity) KeepAlive() bool {
+func (h *HttpClient) KeepAlive() bool {
 	return h.keepAlive
 }
 
-func (h *HttpEntity) HttpClient() *http.Client {
+func (h *HttpClient) HttpClient() *http.Client {
 	return h.httpClient
 }
 
 // simple get method, use this method without specific option, use more easily
-func (h *HttpEntity) SimpleGet(url string, header map[string]string) (*HttpResponse, error) {
+func (h *HttpClient) SimpleGet(url string, header map[string]string) (*HttpResponse, error) {
 	return h.Get(url, header, nil, nil, nil)
 }
 
 // GET method, only use url encoded params
-func (h *HttpEntity) Get(url string, headers map[string]string,
+func (h *HttpClient) Get(url string, headers map[string]string,
 	params map[string]string, cookies []*http.Cookie,
 	option *FetchOption) (*HttpResponse, error) {
 	var httpResponse *HttpResponse = NewHttpResponse()
@@ -73,31 +74,31 @@ func (h *HttpEntity) Get(url string, headers map[string]string,
 	request, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
-		httpResponse.Status = KNewRequestErr
+		httpResponse.Status = NewRequestErr
 		return httpResponse, errors.New(fmt.Sprintf("new request get error: %s", err.Error()))
 	}
 
-	request.URL.RawQuery += http_utils.UrlencodedFrom(params)
+	request.URL.RawQuery += util.UrlencodedFrom(params)
 
 	return h.do(request, httpResponse, headers, cookies, option)
 }
 
 // simple post method, use url encoded type as params
-func (h *HttpEntity) UrlEncodedPost(url string, header map[string]string,
+func (h *HttpClient) UrlEncodedPost(url string, header map[string]string,
 	params map[string]string) (*HttpResponse, error) {
-	return h.Post(url, header, strings.NewReader(http_utils.UrlencodedFrom(params)),
+	return h.Post(url, header, strings.NewReader(util.UrlencodedFrom(params)),
 		FORM_URLENCODED, nil, nil)
 }
 
 // simple post method, use json type as params
-func (h *HttpEntity) JsonPost(url string, header map[string]string,
+func (h *HttpClient) JsonPost(url string, header map[string]string,
 	body []byte) (*HttpResponse, error) {
 	return h.Post(url, header, bytes.NewReader(body), JSON, nil, nil)
 }
 
 // POST method, accept body as post params, auto add Content-Type in header
 // according to FormContentType
-func (h *HttpEntity) Post(url string, headers map[string]string, body io.Reader,
+func (h *HttpClient) Post(url string, headers map[string]string, body io.Reader,
 	contentType FormContentType, cookies []*http.Cookie, option *FetchOption) (*HttpResponse, error) {
 	if headers == nil {
 		headers = make(map[string]string)
@@ -113,14 +114,14 @@ func (h *HttpEntity) Post(url string, headers map[string]string, body io.Reader,
 
 	request, err := http.NewRequest("POST", url, body)
 	if err != nil {
-		httpResponse.Status = KNewRequestErr
+		httpResponse.Status = NewRequestErr
 		return httpResponse, errors.New(fmt.Sprintf("new request get error: %s", err.Error()))
 	}
 
 	return h.do(request, httpResponse, headers, cookies, option)
 }
 
-func (h *HttpEntity) do(request *http.Request, httpResponse *HttpResponse, headers map[string]string,
+func (h *HttpClient) do(request *http.Request, httpResponse *HttpResponse, headers map[string]string,
 	cookies []*http.Cookie, option *FetchOption) (*HttpResponse, error) {
 
 	if option == nil {
@@ -147,7 +148,7 @@ func (h *HttpEntity) do(request *http.Request, httpResponse *HttpResponse, heade
 	}()
 
 	if err != nil {
-		httpResponse.Status = KDoRequestErr
+		httpResponse.Status = DoRequestErr
 		return httpResponse, errors.New(fmt.Sprintf("do request get error: %s", err.Error()))
 	}
 
@@ -155,22 +156,28 @@ func (h *HttpEntity) do(request *http.Request, httpResponse *HttpResponse, heade
 	httpResponse.Cookies = response.Cookies()
 	httpResponse.Header = response.Header
 	if httpResponse.Status != StatusOK {
-		return httpResponse, errors.New(fmt.Sprintf("http status is not StatusOK: %d", httpResponse.Status))
+		return httpResponse, errors.New(
+			fmt.Sprintf("http status is not StatusOK: %d",
+				httpResponse.Status))
 	}
 
 	htmlByte, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		httpResponse.Status = KReadTimeOut
-		return httpResponse, errors.New(fmt.Sprintf("read body get error: %s, len %d", err.Error(), len(htmlByte)))
+		httpResponse.Status = ReadTimeOut
+		return httpResponse, errors.New(
+			fmt.Sprintf("read body get error: %s, len %d",
+				err.Error(), len(htmlByte)))
 	}
 
 	unCompressedContent, err := unCompress(httpResponse, htmlByte)
 	if err != nil {
-		httpResponse.Status = KUncompressErr
-		return httpResponse, errors.New(fmt.Sprintf("unCompress get error: %s", err.Error()))
+		httpResponse.Status = UncompressErr
+		return httpResponse, errors.New(
+			fmt.Sprintf("unCompress get error: %s",
+				err.Error()))
 	}
 	if len(unCompressedContent) == 0 {
-		httpResponse.Status = KUpexpectedErr
+		httpResponse.Status = UpexpectedErr
 	}
 
 	httpResponse.Body = unCompressedContent
@@ -197,7 +204,7 @@ func setHeader(req *http.Request, headers map[string]string, option *FetchOption
 	req.Header.Set("Accept",
 		"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
 	req.Header.Set("Accept-Encoding", "gzip,deflate,sdch")
-	req.Header.Set("User-Agent", getHeaderUA(option.GetUseWapUserAgent()))
+	req.Header.Set("User-Agent", GetHeaderUA(option.GetUseWapUserAgent()))
 
 	// use Header.Set to override default header
 	for k, v := range headers {

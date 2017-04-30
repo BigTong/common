@@ -1,14 +1,16 @@
-package http_entity
+package dns
 
 import (
 	"errors"
 	"net"
 
+	"github.com/BigTong/common/rand"
 	"github.com/miekg/dns"
 )
 
 const (
-	ZERO_IPS_ERROR = "zero ips"
+	ZERO_IPS_ERROR     = "zero ips"
+	ILLEGAL_ADDR_ERROR = "illegal addr, cant get host and port"
 )
 
 type DnsClient struct {
@@ -29,7 +31,7 @@ func NewDnsClient(dnsServerAddr string) DnsClientInterface {
 func (self *DnsClient) ResolveTCPAddr(netw, addr string) (*net.TCPAddr, error) {
 	host, port, err := net.SplitHostPort(addr)
 	if err != nil {
-		return nil, errors.New("illegal addr, cant get host and port")
+		return nil, errors.New(ILLEGAL_ADDR_ERROR)
 	}
 
 	ip := net.ParseIP(host)
@@ -47,6 +49,8 @@ func (self *DnsClient) ResolveTCPAddr(netw, addr string) (*net.TCPAddr, error) {
 
 //TODO use custom local ip for dns look up
 func (self *DnsClient) ResolveTCPAddrWithLAddr() {}
+
+var safeRand = rand.NewSafeRand()
 
 func (self *DnsClient) getIpByHost(host string) (string, error) {
 	ip := ""
@@ -77,7 +81,7 @@ func (self *DnsClient) getIpByHost(host string) (string, error) {
 	if length == 1 {
 		ip = ips[0]
 	} else {
-		ip = ips[rand.Intn(length)]
+		ip = ips[safeRand.Intn(length)]
 	}
 
 	return ip, nil

@@ -1,17 +1,16 @@
-package json_parser
+package json
 
 import (
 	"bytes"
 	"io"
 
-	"common/dlog"
-	"common/parser"
+	"github.com/BigTong/common/parser"
 	"github.com/bitly/go-simplejson"
 )
 
 const (
-	kJsonFakeRoot = "json_fake_path"
-	kMapToArray   = "map_to_array"
+	JSON_FAKE_ROOT = "json_fake_path"
+	MAP_TO_ARRAY   = "map_to_array"
 )
 
 type JsonParser struct {
@@ -27,7 +26,6 @@ func NewJsonParserFromBytes(src []byte) *JsonParser {
 func NewJsonParser(r io.Reader) *JsonParser {
 	jsonDoc, err := simplejson.NewFromReader(r)
 	if err != nil {
-		dlog.Error("new json parser get error:%s", err.Error())
 		return nil
 	}
 

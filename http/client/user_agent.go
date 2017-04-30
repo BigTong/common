@@ -1,6 +1,10 @@
-package http_entity
+package client
 
-var kWebUserAgent = []string{
+import (
+	"github.com/BigTong/common/rand"
+)
+
+var webUserAgent = []string{
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36",
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36",
 	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/600.1.25 (KHTML, like Gecko) Version/8.0 Safari/600.1.25",
@@ -21,16 +25,18 @@ var kWebUserAgent = []string{
 	"Mozilla/5.0 (Windows NT 6.1; rv:33.0) Gecko/20100101 Firefox/33.0",
 }
 
-var kWapUserAgent = []string{
+var wapUserAgent = []string{
 	"Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.10",
 	"Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7",
 }
 
-func getHeaderUA(needWapUA bool) string {
-	length := len(kWapUserAgent)
+var safeRand = rand.NewSafeRand()
+
+func GetHeaderUA(needWapUA bool) string {
+	length := len(wapUserAgent)
 	if needWapUA {
-		return kWapUserAgent[rand.Intn(length)]
+		return wapUserAgent[safeRand.Intn(length)]
 	}
-	length = len(kWebUserAgent)
-	return kWebUserAgent[rand.Intn(length)]
+	length = len(webUserAgent)
+	return webUserAgent[safeRand.Intn(length)]
 }

@@ -1,4 +1,4 @@
-package http_service
+package service
 
 import (
 	"net"
@@ -16,10 +16,12 @@ type Service struct {
 	host         string
 	httpPort     string
 	httpsPort    string
-	handlers     map[string]http.HandlerFunc
-	supportType  int
 	certFileName string
 	keyFileName  string
+
+	supportType int
+
+	handlers map[string]http.HandlerFunc
 }
 
 func (service *Service) Run() {
@@ -27,13 +29,13 @@ func (service *Service) Run() {
 	service.run()
 }
 
-func (service *Service) WithHandleFunc(pattern string,
+func (service *Service) SetHandleFunc(pattern string,
 	handlerFunc http.HandlerFunc) *Service {
 	service.handlers[pattern] = handlerFunc
 	return service
 }
 
-func (service *Service) WithHandleFuncs(
+func (service *Service) SetHandleFuncs(
 	handlers map[string]http.HandlerFunc) *Service {
 	for k, v := range handlers {
 		service.handlers[k] = v
@@ -41,24 +43,24 @@ func (service *Service) WithHandleFuncs(
 	return service
 }
 
-func (service *Service) SupportType(supportType int) *Service {
+func (service *Service) SetSupportType(supportType int) *Service {
 	service.supportType = supportType
 	return service
 }
 
-func (service *Service) SupportHttp(port string) *Service {
+func (service *Service) SetHttpPort(port string) *Service {
 	service.httpPort = port
 	return service
 }
 
-func (service *Service) SupportHttps(port, cert, key string) *Service {
+func (service *Service) SetHttpsConfig(port, cert, key string) *Service {
 	service.httpsPort = port
 	service.certFileName = cert
 	service.keyFileName = key
 	return service
 }
 
-func (service *Service) HttpsCertificate(cert, key string) *Service {
+func (service *Service) SetHttpsCertificate(cert, key string) *Service {
 	service.certFileName = cert
 	service.keyFileName = key
 	return service

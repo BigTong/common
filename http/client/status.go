@@ -1,4 +1,4 @@
-package http_entity
+package client
 
 // crawl status definition
 const (
@@ -99,14 +99,14 @@ const (
 	StatusNetworkAuthenticationRequired = 511
 
 	// customized http code
-	KDefaultHttpRespStatus = 1000
-	KReadTimeOut           = 1001
-	KBodyTooBig            = 1002
-	KUpexpectedErr         = 1003
-	KNewRequestErr         = 1004
-	KDoRequestErr          = 1005
-	KResolveTCPAddrTimeout = 1006
-	KUncompressErr         = 1007
+	DefaultHttpRespStatus = 1000
+	ReadTimeOut           = 1001
+	BodyTooBig            = 1002
+	UpexpectedErr         = 1003
+	NewRequestErr         = 1004
+	DoRequestErr          = 1005
+	ResolveTCPAddrTimeout = 1006
+	UncompressErr         = 1007
 )
 
 var statusText = map[int]string{
@@ -161,14 +161,14 @@ var statusText = map[int]string{
 	StatusHTTPVersionNotSupported:       "HTTP Version Not Supported",
 	StatusNetworkAuthenticationRequired: "Network Authentication Required",
 
-	KDefaultHttpRespStatus: "default http status",
-	KReadTimeOut:           "read body timeout",
-	KBodyTooBig:            "body is too large",
-	KUpexpectedErr:         "unexpected error",
-	KNewRequestErr:         "new request error",
-	KDoRequestErr:          "do request error",
-	KResolveTCPAddrTimeout: "resolve tcp timeout",
-	KUncompressErr:         "uncompress error",
+	DefaultHttpRespStatus: "default http status",
+	ReadTimeOut:           "read body timeout",
+	BodyTooBig:            "body is too large",
+	UpexpectedErr:         "unexpected error",
+	NewRequestErr:         "new request error",
+	DoRequestErr:          "do request error",
+	ResolveTCPAddrTimeout: "resolve tcp timeout",
+	UncompressErr:         "uncompress error",
 }
 
 // StatusText returns a text for the HTTP status code. It returns the empty

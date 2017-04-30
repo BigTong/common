@@ -1,4 +1,4 @@
-package http_service
+package service
 
 import (
 	"net/http"
@@ -29,13 +29,5 @@ func NewHttpAndHttpsService(host, httpPort, httpsPort string) *Service {
 		httpsPort:   httpsPort,
 		handlers:    make(map[string]http.HandlerFunc),
 		supportType: HTTP_AND_HTTPS,
-	}
-}
-
-func NewService(host string) *Service {
-	return &Service{
-		host:        host,
-		handlers:    make(map[string]http.HandlerFunc),
-		supportType: UNKNOWN,
 	}
 }

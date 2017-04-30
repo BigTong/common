@@ -56,3 +56,18 @@ func UnmarshalFromFile(fileName string, v interface{}) error {
 	}
 	return json.Unmarshal(data, v)
 }
+
+func CreateFileAndWriteString(fileName, data string) error {
+	file, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.WriteString(data)
+	return err
+}
+
+func RemoveFile(fileName string) error {
+	return os.Remove(fileName)
+}

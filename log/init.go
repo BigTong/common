@@ -1,7 +1,7 @@
 package log
 
 import (
-	"github.com/BigTong/file"
+	"github.com/BigTong/common/file"
 )
 
 var stdLogger *Logger

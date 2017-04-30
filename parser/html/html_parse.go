@@ -1,10 +1,10 @@
-package html_parser
+package html
 
 import (
 	"io"
+	"log"
 
-	"common/dlog"
-	"common/parser"
+	"github.com/BigTong/common/parser"
 	"github.com/PuerkitoBio/goquery"
 )
 
@@ -15,7 +15,7 @@ type HtmlParser struct {
 func NewHtmlParser(r io.Reader) *HtmlParser {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
-		dlog.Error("new doc get err:%s", err.Error())
+		log.Printf("new doc get err:%s", err.Error())
 		return nil
 	}
 

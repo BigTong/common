@@ -1,4 +1,4 @@
-package http_entity
+package client
 
 import "net/http"
 
@@ -12,7 +12,7 @@ type HttpResponse struct {
 
 func NewHttpResponse() *HttpResponse {
 	return &HttpResponse{
-		Status:  KDefaultHttpRespStatus,
+		Status:  DefaultHttpRespStatus,
 		Body:    []byte{},
 		Header:  nil,
 		Cookies: nil,

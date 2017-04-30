@@ -1,4 +1,4 @@
-package http_entity
+package client
 
 import (
 	"crypto/tls"
@@ -8,11 +8,12 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/BigTong/common/dns"
 	"golang.org/x/net/publicsuffix"
 )
 
-// Builder pattern for construct HttpEntity
-type Builder struct {
+// ClientBuilder pattern for construct HttpEntity
+type ClientBuilder struct {
 	// request timeout threshold
 	timeout int
 
@@ -29,67 +30,67 @@ type Builder struct {
 	keepAlive bool
 
 	// dns client interface, resolve host and ip address
-	dnsClient DnsClientInterface
+	dnsClient dns.DnsClientInterface
 
-	// HttpEntity is product of Builder
-	product *HttpEntity
+	// HttpClient is product of ClientBuilder
+	product *HttpClient
 }
 
 type dialFunc func(netw, addr string) (net.Conn, error)
 type proxyFunc func(*http.Request) (*url.URL, error)
 type redirectFunc func(req *http.Request, via []*http.Request) error
 
-// HttpEntityBuilder is builder pattern, construct a HttpEntity
-func HttpEntityBuilder(timeout int) *Builder {
-	builder := new(Builder)
-	builder.timeout = timeout
-	builder.proxy = ""
-	builder.ip = ""
-	builder.needCookie = false
-	builder.keepAlive = false
+// HttpEntityClientBuilder is ClientBuilder pattern, construct a HttpClient
+func HttpClientBuilder(timeout int) *ClientBuilder {
+	ClientBuilder := new(ClientBuilder)
+	ClientBuilder.timeout = timeout
+	ClientBuilder.proxy = ""
+	ClientBuilder.ip = ""
+	ClientBuilder.needCookie = false
+	ClientBuilder.keepAlive = false
 
-	builder.dnsClient = defaultDnsClientInstance
-	return builder
+	ClientBuilder.dnsClient = dns.DefaultDnsClientInstance
+	return ClientBuilder
 }
 
-func (b *Builder) Ip(ip string) *Builder {
+func (b *ClientBuilder) Ip(ip string) *ClientBuilder {
 	if len(ip) != 0 {
 		b.ip = ip
 	}
 	return b
 }
 
-func (b *Builder) Proxy(proxy string) *Builder {
+func (b *ClientBuilder) Proxy(proxy string) *ClientBuilder {
 	if len(proxy) != 0 {
 		b.proxy = proxy
 	}
 	return b
 }
 
-func (b *Builder) DnsClient(dns DnsClientInterface) *Builder {
+func (b *ClientBuilder) DnsClient(dns dns.DnsClientInterface) *ClientBuilder {
 	if dns != nil {
 		b.dnsClient = dns
 	}
 	return b
 }
 
-func (b *Builder) CookieJar(needCookie bool) *Builder {
+func (b *ClientBuilder) CookieJar(needCookie bool) *ClientBuilder {
 	b.needCookie = needCookie
 	return b
 }
 
-func (b *Builder) KeepAlive(keepAlive bool) *Builder {
+func (b *ClientBuilder) KeepAlive(keepAlive bool) *ClientBuilder {
 	b.keepAlive = keepAlive
 	return b
 }
 
-func (b *Builder) Build() *HttpEntity {
-	b.buildHttpEntity()
+func (b *ClientBuilder) Build() *HttpClient {
+	b.buildHttpClient()
 	return b.product
 }
 
-func (b *Builder) createHttpEntity() {
-	b.product = new(HttpEntity)
+func (b *ClientBuilder) createHttpClient() {
+	b.product = new(HttpClient)
 
 	b.product.timeout = b.timeout
 	b.product.ip = b.ip
@@ -100,8 +101,8 @@ func (b *Builder) createHttpEntity() {
 	b.product.dnsClient = b.dnsClient
 }
 
-func (b *Builder) buildHttpEntity() {
-	b.createHttpEntity()
+func (b *ClientBuilder) buildHttpClient() {
+	b.createHttpClient()
 	client := &http.Client{
 		Transport: &http.Transport{
 			Dial:                  b.getDial(),
@@ -111,12 +112,12 @@ func (b *Builder) buildHttpEntity() {
 			Proxy:                 b.getProxy(),
 		},
 	}
-	//client.CheckRedirect = b.getRedirect()
+	// client.CheckRedirect = b.getRedirect()
 	client.Jar = b.getCookieJar()
 	b.product.httpClient = client
 }
 
-func (b *Builder) getCookieJar() http.CookieJar {
+func (b *ClientBuilder) getCookieJar() http.CookieJar {
 	if b.product.needCookie {
 		options := &cookiejar.Options{
 			PublicSuffixList: publicsuffix.List,
@@ -131,7 +132,7 @@ func (b *Builder) getCookieJar() http.CookieJar {
 }
 
 /*
-func (b *Builder) getRedirect() redirectFunc {
+func (b *ClientBuilder) getRedirect() redirectFunc {
 	if b.product.redirect {
 		return nil
 	}
@@ -142,7 +143,7 @@ func (b *Builder) getRedirect() redirectFunc {
 */
 
 // unchecked
-func (b *Builder) getProxy() proxyFunc {
+func (b *ClientBuilder) getProxy() proxyFunc {
 	if len(b.product.proxy) == 0 {
 		return nil
 	}
@@ -154,7 +155,7 @@ func (b *Builder) getProxy() proxyFunc {
 }
 
 // return a dialFunc for transport dial
-func (b *Builder) getDial() dialFunc {
+func (b *ClientBuilder) getDial() dialFunc {
 	dial := func(netw, addr string) (net.Conn, error) {
 		rAddr, err := b.product.dnsClient.ResolveTCPAddr(netw, addr)
 		if err != nil {

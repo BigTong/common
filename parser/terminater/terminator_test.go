@@ -1,10 +1,10 @@
-package terminator
+package terminater
 
 import (
 	"encoding/json"
 	"testing"
 
-	"common"
+	"github.com/BigTong/common/file"
 )
 
 var htmlConfig string = `{
@@ -90,8 +90,8 @@ var jsonConfig string = `{
 `
 
 func TestHtmlParse(t *testing.T) {
-	src := common.ReadFileToString("test_data/html")
-	laziParse := NewLazyParser()
+	src := file.ReadFileToString("test_data/html")
+	parser := NewTerminater()
 
 	config := make(map[string]interface{})
 	err := json.Unmarshal([]byte(htmlConfig), &config)
@@ -100,14 +100,14 @@ func TestHtmlParse(t *testing.T) {
 		return
 	}
 
-	result := laziParse.Parse(src, config)
+	result := parser.Parse(src, config)
 	data, _ := json.Marshal(result)
 	t.Log(string(data))
 }
 
 func TestJsonParse(t *testing.T) {
-	src := common.ReadFileToString("test_data/json")
-	laziParse := NewLazyParser()
+	src := file.ReadFileToString("test_data/json")
+	parser := NewTerminater()
 
 	config := make(map[string]interface{})
 	err := json.Unmarshal([]byte(jsonConfig), &config)
@@ -116,7 +116,7 @@ func TestJsonParse(t *testing.T) {
 		return
 	}
 
-	result := laziParse.Parse(src, config)
+	result := parser.Parse(src, config)
 	data, _ := json.Marshal(result)
 	t.Log(string(data))
 }

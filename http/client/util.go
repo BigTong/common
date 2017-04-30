@@ -1,4 +1,4 @@
-package http_entity
+package client
 
 import (
 	"bytes"
@@ -8,13 +8,12 @@ import (
 	"io/ioutil"
 	"strings"
 
-	"common"
+	"github.com/BigTong/common/encodings"
 )
 
 // all field and method is package private in this file, easy to refactor util.go
 
-var rand *common.SafeRand = common.NewSafeRand()
-var utf8Converter *common.Utf8Converter = common.NewUtf8Converter()
+var utf8Converter *encodings.Utf8Converter = encodings.NewUtf8Converter()
 
 // support gzip and deflate uncompress
 func unCompress(resp *HttpResponse, content []byte) ([]byte, error) {
@@ -64,6 +63,7 @@ func deflate(html []byte) ([]byte, error) {
 	html = bytes.TrimPrefix(html, []byte("\x78\x9c"))
 	reader := flate.NewReader(bytes.NewReader(html))
 	defer reader.Close()
+
 	enflated, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return html, err

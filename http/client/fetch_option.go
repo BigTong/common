@@ -1,4 +1,4 @@
-package http_entity
+package client
 
 var defaultFetchOption *FetchOption = &FetchOption{
 	useWapUserAgent: false,

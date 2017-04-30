@@ -1,4 +1,4 @@
-package http_entity
+package client
 
 import (
 	"errors"
@@ -6,25 +6,25 @@ import (
 
 // provide some static factory method for constructing http_entity
 
-func NewHttpEntity(timeout int) (*HttpEntity, error) {
-	builder := HttpEntityBuilder(timeout)
+func NewHttpClient(timeout int) (*HttpClient, error) {
+	builder := HttpClientBuilder(timeout)
 	return builder.Build(), nil
 }
 
-func NewHttpEntityWithIp(timeout int, ip string) (*HttpEntity, error) {
+func NewHttpClientWithIp(timeout int, ip string) (*HttpClient, error) {
 	if len(ip) == 0 {
 		return nil, errors.New("ip address is invalid")
 	}
 
-	builder := HttpEntityBuilder(timeout)
+	builder := HttpClientBuilder(timeout)
 	return builder.Ip(ip).Build(), nil
 }
 
-func NewHttpEntityWithProxy(timeout int, proxy string) (*HttpEntity, error) {
+func NewHttpClientWithProxy(timeout int, proxy string) (*HttpClient, error) {
 	if len(proxy) == 0 {
 		return nil, errors.New("proxy address is invalid")
 	}
 
-	builder := HttpEntityBuilder(timeout)
+	builder := HttpClientBuilder(timeout)
 	return builder.Proxy(proxy).Build(), nil
 }

@@ -1,19 +1,17 @@
-package html_parser
+package html
 
 import (
 	"strconv"
 	"strings"
 
-	"common"
-	"common/dlog"
-	"common/parser"
+	"github.com/BigTong/common/parser"
+	cstrings "github.com/BigTong/common/strings"
 	"github.com/PuerkitoBio/goquery"
 )
 
 func StringToInt64(src string) int64 {
 	val, err := strconv.ParseInt(src, 10, 64)
 	if err != nil {
-		dlog.Error("parse int64 get error:%s, src:%s", err.Error(), src)
 		return 0
 	}
 	return val
@@ -26,7 +24,6 @@ func StringToInt(src string) int {
 func StringToFloat64(src string) float64 {
 	val, err := strconv.ParseFloat(src, 64)
 	if err != nil {
-		dlog.Error("parse float64 get error:%s, src:%s", err.Error(), src)
 		return 0.0
 	}
 	return val
@@ -97,10 +94,10 @@ func ParseString(doc *goquery.Selection, selector *parser.Selector) string {
 	}
 
 	if len(selector.Extractor) != 0 {
-		_, ret = common.StringExtract(ret, selector.Extractor)
+		_, ret = cstrings.StringExtract(ret, selector.Extractor)
 	}
 
-	return common.CleanString(ret)
+	return cstrings.CleanString(ret)
 }
 
 func GetOneSelection(doc *goquery.Selection,

@@ -1,25 +1,25 @@
 package parser
 
 const (
-	KObjectConfig  = "kObject"
-	KElemConfig    = "kElem"
-	KUnknownConfig = "kUnknown"
+	OBJECT_CONFIG  = "object_config"
+	ELEM_CONFIG    = "elem_config"
+	UNKNOWN_CONFIG = "unknown_config"
 )
 
 const (
-	KInt    = "int"
-	KFloat  = "float"
-	KString = "string"
+	TYPE_INT    = "int"
+	TYPE_FLOAT  = "float"
+	TYPE_STRING = "string"
 )
 
 const (
-	KContentJson   = "json"
-	KContentHtml   = "html"
-	KContentString = "string"
+	CONTENT_TYPE_JSON   = "json"
+	CONTENT_TYPE_HTML   = "html"
+	CONTENT_TYPE_STRING = "string"
 )
 
 const (
-	KInputType = "_input_type"
+	INPUT_TYPE = "_input_type"
 )
 
 type Selector struct {

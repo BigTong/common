@@ -1,17 +1,16 @@
-package html_parser
+package html
 
 import (
 	"strings"
 	"testing"
 
-	"common"
-	"common/dlog"
-	"common/parser"
+	"github.com/BigTong/common/file"
+	"github.com/BigTong/common/parser"
 	"github.com/bmizerany/assert"
 )
 
 func TestHtmlParse(t *testing.T) {
-	testData := common.ReadFileToString("html_string")
+	testData := file.ReadFileToString("html_string")
 	htmlParser := NewHtmlParser(strings.NewReader(testData))
 
 	s := &parser.Selector{
@@ -39,5 +38,5 @@ func TestHtmlParse(t *testing.T) {
 		Xpath: "div.toctree-wrapper.compound ul li",
 		Index: "1",
 	}
-	dlog.Info(htmlParser.GetString(s))
+	t.Log(htmlParser.GetString(s))
 }

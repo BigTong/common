@@ -1,11 +1,12 @@
-package stringutil
+package strings
 
 import (
 	"regexp"
 	"strings"
 	"time"
 
-	"github.com/BigTong/common/time"
+	ctime "github.com/BigTong/common/time"
+	"github.com/BigTong/common/url"
 )
 
 func CleanString(src string) string {
@@ -178,11 +179,11 @@ func StringExtract(src, cmds string) (string, string) {
 		case "regexp_replace":
 			val = regexpReplace(val, cmd.Param)
 		case "parse_url":
-			val = ResolveReference(cmd.Param, val)
+			val, _ = url.ResolveReference(cmd.Param, val)
 		case "fix_time":
 			val = fixTime(val)
 		case "time_fmt":
-			fmtTime, err := time.TimeFormat(val)
+			fmtTime, err := ctime.TimeFormat(val)
 			val = fmtTime
 			if err != nil {
 				val = ""

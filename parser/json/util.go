@@ -1,4 +1,4 @@
-package json_parser
+package json
 
 import (
 	"bytes"
@@ -7,9 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"common"
-	"common/dlog"
-	"common/parser"
+	"github.com/BigTong/common/parser"
+	cstrings "github.com/BigTong/common/strings"
 	"github.com/bitly/go-simplejson"
 )
 
@@ -34,7 +33,6 @@ func MapToArray(js *simplejson.Json) []*simplejson.Json {
 		data, _ := json.Marshal(v)
 		tmpJson, err := simplejson.NewFromReader(bytes.NewReader(data))
 		if err != nil {
-			dlog.Error("unmashal json get error:%s,%s", err.Error(), data)
 			continue
 		}
 		tmpJson.Set("_key", k)
@@ -54,8 +52,6 @@ func GetInt64ValFromJsonDoc(s *parser.Selector,
 	if len(vals) == 1 {
 		val, err := vals[0].Int64()
 		if err != nil {
-			dlog.Error("get int64 value from json get error:%s",
-				err.Error())
 			return 0
 		}
 		return val
@@ -74,8 +70,6 @@ func GetIntValFromJsonDoc(s *parser.Selector,
 	if len(vals) == 1 {
 		val, err := vals[0].Int()
 		if err != nil {
-			dlog.Error("get int value from json get error:%s",
-				err.Error())
 			return 0
 		}
 		return val
@@ -104,7 +98,7 @@ func GetStringValFromJsonDoc(s *parser.Selector,
 	jsonDoc *simplejson.Json) string {
 	ret := GetRawStringValFromJsonDoc(s, jsonDoc)
 	if len(ret) != 0 && len(s.Extractor) != 0 {
-		_, ret = common.StringExtract(ret, s.Extractor)
+		_, ret = cstrings.StringExtract(ret, s.Extractor)
 	}
 	return ret
 
@@ -146,9 +140,9 @@ func GetJsonObjectsFromDoc(branch []string,
 	b0 := branch[0]
 	k, n := keyIndex(b0)
 	value := jsonDoc.Get(k)
-	if k == kJsonFakeRoot {
+	if k == JSON_FAKE_ROOT {
 		value = jsonDoc
-	} else if k == kMapToArray {
+	} else if k == MAP_TO_ARRAY {
 		array := MapToArray(jsonDoc)
 		ret := []*simplejson.Json{}
 		for _, v := range array {

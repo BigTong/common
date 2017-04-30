@@ -1,16 +1,16 @@
-package json_parser
+package json
 
 import (
 	"strings"
 	"testing"
 
-	"common"
-	"common/parser"
+	"github.com/BigTong/common/file"
+	"github.com/BigTong/common/parser"
 	"github.com/bmizerany/assert"
 )
 
 func TestJosnParse(t *testing.T) {
-	testData := common.ReadFileToString("json_string")
+	testData := file.ReadFileToString("json_string")
 	jsonParser := NewJsonParser(strings.NewReader(testData))
 	s := &parser.Selector{JsonKey: "pagecount"}
 	assert.Equal(t, jsonParser.GetInt(s), int(2))

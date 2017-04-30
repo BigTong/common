@@ -1,50 +1,51 @@
-package urlutil
+package url
 
 import (
-	"golang.org/x/net/publicsuffix"
+	"errors"
 	"net/url"
-	// "github.com/BigTong/common/log"
+
+	"golang.org/x/net/publicsuffix"
 )
 
-func ResolveReference(base, link string) string {
+const (
+	ERR_EMPTY_URL = "empty url"
+)
+
+func ResolveReference(base, link string) (string, error) {
 	if len(link) == 0 {
-		return ""
+		return "", errors.New(ERR_EMPTY_URL)
 	}
 
 	iUrl, err := url.Parse(base)
 	if err != nil {
-		return link
+		return "", err
 	}
 
 	ref, err := url.Parse(link)
 	if err != nil {
-		// log.Error("unescape url get err:%s", link)
-		return link
+		return "", err
 	}
 
 	urlString := iUrl.ResolveReference(ref).String()
 	val, err := url.QueryUnescape(urlString)
 	if err != nil {
-		// log.Error("unescape url get err:%s", link)
-		return link
+		return "", err
 	}
-	return val
+	return val, nil
 }
 
-func ExtractDomain(host string) string {
+func ExtractDomain(host string) (string, error) {
 	suffix, err := publicsuffix.EffectiveTLDPlusOne(host)
 	if err != nil {
-		// log.Warn("parse domain get error:%s", err.Error())
-		return host
+		return "", err
 	}
-	return suffix
+	return suffix, nil
 }
 
-func ExtractHost(link string) string {
+func ExtractHost(link string) (string, error) {
 	parsedUrl, err := url.Parse(link)
 	if err != nil {
-		// log.Warn("not parsed url successs:%s", link)
-		return link
+		return "", err
 	}
-	return parsedUrl.Host
+	return parsedUrl.Host, nil
 }

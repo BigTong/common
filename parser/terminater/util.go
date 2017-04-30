@@ -1,9 +1,9 @@
-package terminator
+package terminater
 
 import (
 	"encoding/json"
 
-	"common/parser"
+	"github.com/BigTong/common/parser"
 )
 
 func MapToInputConfig(val interface{}) (*parser.InputConfig, error) {

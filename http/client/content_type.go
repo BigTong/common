@@ -1,4 +1,4 @@
-package http_entity
+package client
 
 type FormContentType string
 
