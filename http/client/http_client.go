@@ -13,6 +13,12 @@ import (
 	"github.com/BigTong/common/http/util"
 )
 
+const (
+	HTTP_GET  = "GET"
+	HTTP_POST = "POST"
+	HTTP_PUT  = "PUT"
+)
+
 type HttpClient struct {
 	// request timeout threshold
 	timeout int
@@ -60,8 +66,10 @@ func (h *HttpClient) HttpClient() *http.Client {
 	return h.httpClient
 }
 
-// simple get method, use this method without specific option, use more easily
-func (h *HttpClient) SimpleGet(url string, header map[string]string) (*HttpResponse, error) {
+// simple get method, use this method without
+// specific option, use more easily
+func (h *HttpClient) SimpleGet(url string,
+	header map[string]string) (*HttpResponse, error) {
 	return h.Get(url, header, nil, nil, nil)
 }
 
@@ -71,11 +79,12 @@ func (h *HttpClient) Get(url string, headers map[string]string,
 	option *FetchOption) (*HttpResponse, error) {
 	var httpResponse *HttpResponse = NewHttpResponse()
 
-	request, err := http.NewRequest("GET", url, nil)
+	request, err := http.NewRequest(HTTP_GET, url, nil)
 
 	if err != nil {
 		httpResponse.Status = NewRequestErr
-		return httpResponse, errors.New(fmt.Sprintf("new request get error: %s", err.Error()))
+		return httpResponse, errors.New(
+			fmt.Sprintf("new request get error: %s", err.Error()))
 	}
 
 	request.URL.RawQuery += util.UrlencodedFrom(params)
@@ -84,22 +93,33 @@ func (h *HttpClient) Get(url string, headers map[string]string,
 }
 
 // simple post method, use url encoded type as params
-func (h *HttpClient) UrlEncodedPost(url string, header map[string]string,
+func (h *HttpClient) UrlEncodedPost(url string,
+	header map[string]string,
 	params map[string]string) (*HttpResponse, error) {
-	return h.Post(url, header, strings.NewReader(util.UrlencodedFrom(params)),
+	return h.setHeaderContentTypeAndDo(url, HTTP_POST,
+		header, strings.NewReader(util.UrlencodedFrom(params)),
 		FORM_URLENCODED, nil, nil)
 }
 
 // simple post method, use json type as params
 func (h *HttpClient) JsonPost(url string, header map[string]string,
 	body []byte) (*HttpResponse, error) {
-	return h.Post(url, header, bytes.NewReader(body), JSON, nil, nil)
+	return h.setHeaderContentTypeAndDo(url, HTTP_POST,
+		header, bytes.NewReader(body), JSON, nil, nil)
 }
 
-// POST method, accept body as post params, auto add Content-Type in header
+func (h *HttpClient) JsonPut(url string, header map[string]string,
+	body []byte) (*HttpResponse, error) {
+	return h.setHeaderContentTypeAndDo(url, HTTP_PUT, header,
+		bytes.NewReader(body), JSON, nil, nil)
+}
+
+// accept body as post params, auto add Content-Type in header
 // according to FormContentType
-func (h *HttpClient) Post(url string, headers map[string]string, body io.Reader,
-	contentType FormContentType, cookies []*http.Cookie, option *FetchOption) (*HttpResponse, error) {
+func (h *HttpClient) setHeaderContentTypeAndDo(url, method string,
+	headers map[string]string, body io.Reader,
+	contentType FormContentType, cookies []*http.Cookie,
+	option *FetchOption) (*HttpResponse, error) {
 	if headers == nil {
 		headers = make(map[string]string)
 	}
@@ -112,16 +132,18 @@ func (h *HttpClient) Post(url string, headers map[string]string, body io.Reader,
 
 	var httpResponse *HttpResponse = NewHttpResponse()
 
-	request, err := http.NewRequest("POST", url, body)
+	request, err := http.NewRequest(method, url, body)
 	if err != nil {
 		httpResponse.Status = NewRequestErr
-		return httpResponse, errors.New(fmt.Sprintf("new request get error: %s", err.Error()))
+		return httpResponse, errors.New(
+			fmt.Sprintf("new request get error: %s", err.Error()))
 	}
 
 	return h.do(request, httpResponse, headers, cookies, option)
 }
 
-func (h *HttpClient) do(request *http.Request, httpResponse *HttpResponse, headers map[string]string,
+func (h *HttpClient) do(request *http.Request,
+	httpResponse *HttpResponse, headers map[string]string,
 	cookies []*http.Cookie, option *FetchOption) (*HttpResponse, error) {
 
 	if option == nil {
@@ -149,7 +171,8 @@ func (h *HttpClient) do(request *http.Request, httpResponse *HttpResponse, heade
 
 	if err != nil {
 		httpResponse.Status = DoRequestErr
-		return httpResponse, errors.New(fmt.Sprintf("do request get error: %s", err.Error()))
+		return httpResponse, errors.New(
+			fmt.Sprintf("do request get error: %s", err.Error()))
 	}
 
 	httpResponse.Status = response.StatusCode
@@ -199,7 +222,8 @@ func setCookies(request *http.Request, cookies []*http.Cookie) {
 	}
 }
 
-func setHeader(req *http.Request, headers map[string]string, option *FetchOption) {
+func setHeader(req *http.Request,
+	headers map[string]string, option *FetchOption) {
 	req.Header.Set("Cache-Control", "no-cache")
 	req.Header.Set("Accept",
 		"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")

@@ -38,16 +38,16 @@ func Get(url string, headers map[string]string,
 // simple post method, use url encoded content type as params
 func UrlEncodedPost(url string, header map[string]string,
 	params map[string]string) (*HttpResponse, error) {
-	return defaultHttpClient.Post(url, header,
-		strings.NewReader(util.UrlencodedFrom(params)),
+	return defaultHttpClient.setHeaderContentTypeAndDo(url,
+		HTTP_POST, header, strings.NewReader(util.UrlencodedFrom(params)),
 		FORM_URLENCODED, nil, nil)
 }
 
 // simple post method, use json type as params
 func JsonPost(url string, header map[string]string,
 	body []byte) (*HttpResponse, error) {
-	return defaultHttpClient.Post(url, header,
-		bytes.NewReader(body), JSON, nil, nil)
+	return defaultHttpClient.setHeaderContentTypeAndDo(url,
+		HTTP_POST, header, bytes.NewReader(body), JSON, nil, nil)
 }
 
 // POST method, accept body as post params, auto add Content-Type in header
@@ -58,7 +58,6 @@ func Post(url string,
 	contentType FormContentType,
 	cookies []*http.Cookie,
 	option *FetchOption) (*HttpResponse, error) {
-	return defaultHttpClient.Post(url,
-		headers, body, contentType,
-		cookies, option)
+	return defaultHttpClient.setHeaderContentTypeAndDo(url,
+		HTTP_POST, headers, body, contentType, cookies, option)
 }
